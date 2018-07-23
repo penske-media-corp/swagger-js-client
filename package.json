@@ -1,8 +1,8 @@
 {
-  "name": "swagger-js-client",
+  "name": "@sheknows/swagger-js-client",
   "version": "1.0.0",
   "description": "SheKnows universal Swagger JS client",
-  "license": "Unlicense",
+  "license": "MIT",
   "main": "build/index.js",
   "module": "src/index.js",
   "private": false,
