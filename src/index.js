@@ -4,6 +4,7 @@ import urljoin from 'url-join'
 import { URL } from 'url'
 
 let client
+let limit = 10
 const getClient = ({
   host, key, secret, swaggerUrl, ...userOptions
 } = {}) =>
@@ -32,19 +33,30 @@ const getClient = ({
       ...userOptions
     }
 
-    new Swagger(options)
-      .then(generatedClient => {
-        const parsedUrl = new URL(generatedClient.url)
-        generatedClient.spec.host = parsedUrl.host
-        generatedClient.spec.basePath = parsedUrl.pathname.replace(/swagger.json/ig, '')
-        client = generatedClient
+    let count = 0
 
-        resolve(client)
-      })
-      .catch(err => {
-        err.message = `Could not create client: ${err.message}`
-        reject(new Error(err))
-      })
+    const getNewClient = () => {
+      new Swagger(options)
+        .then(generatedClient => {
+          const parsedUrl = new URL(generatedClient.url)
+          generatedClient.spec.host = parsedUrl.host
+          generatedClient.spec.basePath = parsedUrl.pathname.replace(/swagger.json/ig, '')
+          client = generatedClient
+
+          resolve(client)
+        })
+        .catch(err => {
+          if (count < limit) {
+            count++
+            getNewClient()
+          } else {
+            err.message = `Could not create client: ${err.message}`
+            reject(new Error(err))
+          }
+        })
+    }
+
+    getNewClient()
   })
 
 export default getClient
