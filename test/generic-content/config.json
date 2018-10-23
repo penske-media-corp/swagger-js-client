@@ -3,5 +3,8 @@
     "host": "http://staging-api.sheknows.com:8080/content",
     "key": "57b5d107cae6e0002d00000143aaf984d3364d2472977dc33843d3fd",
     "secret": "Y2M5MGMzMmRjZmY3NGEwMzY1MzJjM2NiNzVkNTlhM2Y="
+  },
+  "params": {
+    "retryCount": 5
   }
 }
