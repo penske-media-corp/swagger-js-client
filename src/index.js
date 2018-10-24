@@ -4,7 +4,7 @@ import urljoin from 'url-join'
 import { URL } from 'url'
 
 let client
-let retryCountDefault = 10
+const RETRY_COUNT_DEFAULT = 10
 const getClient = ({
   host, key, secret, swaggerUrl, retryCount, ...userOptions
 } = {}) =>
@@ -35,10 +35,7 @@ const getClient = ({
 
     let count = 0
 
-    retryCount = parseInt(retryCount)
-    let retryLimit = retryCount > 0 && retryCount < 100
-      ? retryCount
-      : retryCountDefault
+    const retryLimit = parseInt(retryCount || RETRY_COUNT_DEFAULT, 10)
 
     const getNewClient = () => {
       new Swagger(options)
