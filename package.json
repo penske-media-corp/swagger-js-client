@@ -8,7 +8,7 @@
   "private": false,
   "scripts": {
     "build": "babel src --out-dir build",
-    "test": "mocha --compilers js:babel-core/register --recursive",
+    "test": "mocha --compilers js:babel-core/register --recursive --opts mocha.opts",
     "lint": "eslint 'src/**/*.js' --ignore-path .gitignore"
   },
   "browser": {
