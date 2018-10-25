@@ -1,6 +1,6 @@
 {
   "name": "@sheknows/swagger-js-client",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "SheKnows universal Swagger JS client",
   "license": "MIT",
   "main": "build/index.js",
