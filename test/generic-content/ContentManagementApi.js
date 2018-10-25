@@ -7,7 +7,8 @@ const instance = () =>
   getClient({
     host: config.api.host,
     key: config.api.key,
-    secret: config.api.secret
+    secret: config.api.secret,
+    retryCount: config.params.retryCount
   })
     .then(client => {
       return client.apis['Content Management']

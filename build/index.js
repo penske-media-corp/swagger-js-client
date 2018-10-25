@@ -25,10 +25,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 let client;
+const RETRY_COUNT_DEFAULT = 10;
 const getClient = (_ref = {}) => {
   let {
-    host, key, secret, swaggerUrl } = _ref,
-      userOptions = _objectWithoutProperties(_ref, ['host', 'key', 'secret', 'swaggerUrl']);
+    host, key, secret, swaggerUrl, retryCount } = _ref,
+      userOptions = _objectWithoutProperties(_ref, ['host', 'key', 'secret', 'swaggerUrl', 'retryCount']);
 
   return new Promise((resolve, reject) => {
     if (client) {
@@ -52,17 +53,30 @@ const getClient = (_ref = {}) => {
       }
     }, userOptions);
 
-    new _swaggerClient2.default(options).then(generatedClient => {
-      const parsedUrl = new _url.URL(generatedClient.url);
-      generatedClient.spec.host = parsedUrl.host;
-      generatedClient.spec.basePath = parsedUrl.pathname.replace(/swagger.json/ig, '');
-      client = generatedClient;
+    let count = 0;
 
-      resolve(client);
-    }).catch(err => {
-      err.message = `Could not create client: ${err.message}`;
-      reject(new Error(err));
-    });
+    const retryLimit = parseInt(retryCount || RETRY_COUNT_DEFAULT, 10);
+
+    const getNewClient = () => {
+      new _swaggerClient2.default(options).then(generatedClient => {
+        const parsedUrl = new _url.URL(generatedClient.url);
+        generatedClient.spec.host = parsedUrl.host;
+        generatedClient.spec.basePath = parsedUrl.pathname.replace(/swagger.json/ig, '');
+        client = generatedClient;
+
+        resolve(client);
+      }).catch(err => {
+        if (count < retryLimit) {
+          count++;
+          getNewClient();
+        } else {
+          err.message = `Could not create client: ${err.message}`;
+          reject(new Error(err));
+        }
+      });
+    };
+
+    getNewClient();
   });
 };
 
