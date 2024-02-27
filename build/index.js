@@ -24,7 +24,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
-let client;
+let client = {};
 const RETRY_COUNT_DEFAULT = 10;
 const getClient = (_ref = {}) => {
   let {
@@ -32,15 +32,16 @@ const getClient = (_ref = {}) => {
       userOptions = _objectWithoutProperties(_ref, ['host', 'key', 'secret', 'swaggerUrl', 'retryCount']);
 
   return new Promise((resolve, reject) => {
-    if (client) {
-      return resolve(client);
-    }
-
     if (!(host || swaggerUrl) || !key || !secret) {
       return reject(new Error('Required options (`host`, `key`, `secret`) missing! Aborting.'));
     }
 
     swaggerUrl = swaggerUrl || (0, _urlJoin2.default)(host, 'swagger.json');
+
+    if (client[swaggerUrl]) {
+      return resolve(client[swaggerUrl]);
+    }
+
     const authHeaders = (0, _hmacAuth2.default)(key, secret).generateHeaders();
 
     const options = _extends({
@@ -62,9 +63,9 @@ const getClient = (_ref = {}) => {
         const parsedUrl = new _url.URL(generatedClient.url);
         generatedClient.spec.host = parsedUrl.host;
         generatedClient.spec.basePath = parsedUrl.pathname.replace(/swagger.json/ig, '');
-        client = generatedClient;
+        client[swaggerUrl] = generatedClient;
 
-        resolve(client);
+        resolve(client[swaggerUrl]);
       }).catch(err => {
         if (count < retryLimit) {
           count++;

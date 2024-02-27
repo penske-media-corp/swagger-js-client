@@ -1,6 +1,6 @@
 {
   "api": {
-    "host": "http://staging-api.sheknows.com:8080/content",
+    "host": "http://sites-api.revtech.sheknows.io:8080/api",
     "key": "57b5d107cae6e0002d00000143aaf984d3364d2472977dc33843d3fd",
     "secret": "Y2M5MGMzMmRjZmY3NGEwMzY1MzJjM2NiNzVkNTlhM2Y="
   },
