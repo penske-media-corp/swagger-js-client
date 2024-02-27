@@ -3,16 +3,12 @@ import hmacAuth from './hmacAuth'
 import urljoin from 'url-join'
 import { URL } from 'url'
 
-let client
+let client = {}
 const RETRY_COUNT_DEFAULT = 10
 const getClient = ({
   host, key, secret, swaggerUrl, retryCount, ...userOptions
 } = {}) =>
   new Promise((resolve, reject) => {
-    if (client) {
-      return resolve(client)
-    }
-
     if (!(host || swaggerUrl) || !key || !secret) {
       return reject(new Error(
         'Required options (`host`, `key`, `secret`) missing! Aborting.'
@@ -20,6 +16,11 @@ const getClient = ({
     }
 
     swaggerUrl = swaggerUrl || urljoin(host, 'swagger.json')
+
+    if (client[swaggerUrl]) {
+      return resolve(client[swaggerUrl])
+    }
+
     const authHeaders = hmacAuth(key, secret).generateHeaders()
 
     const options = {
@@ -43,9 +44,9 @@ const getClient = ({
           const parsedUrl = new URL(generatedClient.url)
           generatedClient.spec.host = parsedUrl.host
           generatedClient.spec.basePath = parsedUrl.pathname.replace(/swagger.json/ig, '')
-          client = generatedClient
+          client[swaggerUrl] = generatedClient
 
-          resolve(client)
+          resolve(client[swaggerUrl])
         })
         .catch(err => {
           if (count < retryLimit) {
